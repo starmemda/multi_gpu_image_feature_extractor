@@ -3,7 +3,7 @@ pytorch;multi gpu;image feature;
 
 This is an implementation of extractig feature from image with resnet(pretrained on imagenet or place365) or swin_transformer.
 
-##run
+## run
 run the code by:
 ```
 sh extract.sh
