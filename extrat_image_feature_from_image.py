@@ -11,8 +11,6 @@ import numpy as np
 import torch.backends.cudnn as cudnn
 import sys 
 from PIL import Image
-sys.path.append("..")
-sys.path.append("../../../src/models")
 from make_swin import *
 from tqdm import tqdm
 from resnet import ResNet50
@@ -47,18 +45,6 @@ class Dataset_f(torch.utils.data.Dataset):
         if self.transform is not None:
             img = self.transform(img)
         return img, fname
-#         except:
-#             print(fname)
-#             fname = self.dataset[0]
-#             fpath = self.dataset[0]
-#             if os.path.isfile(fpath):
-#                 img = Image.open(fpath).convert('RGB')
-#             else:
-#                 img = Image.new('RGB', self.default_size)
-#                 print('No such images: {:s}'.format(fpath))
-#             if self.transform is not None:
-#                 img = self.transform(img)
-#             return img, fname
             
     
 def get_data(imglist_file, batch_size):
@@ -102,26 +88,31 @@ def write_feature(features, fname, args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("Place feature using resnet with ImageNet pretrain")
     parser.add_argument('--imagelist_file', type=str,\
-                        default="/hetu_group/wuxiangyu/cx/algo/script/train_list1.txt")
+                        default="imagelist_file")
     parser.add_argument('--out_path_root', type=str, default= \
-                        "/hetu_group/wuxiangyu/cx/algo/SceneSeg/sceneseg_predata/swin_l_scene128_384")
+                        "out_path_root")
+    parser.add_argument('--modelname', type=str, default= \
+                        "resnet_imagenet")
     parser.add_argument('--resume', type=str, default= \
                         "swin_base_patch4_window12_384_22k.pth")
     parser.add_argument('-b', '--batch-size', type=int, default=42)
     args = parser.parse_args()
     
-    
-#    model = ResNet50(pretrained=True)
-    
-    model = swin_base_patch4_window12_384_in22k()
-    state = torch.load(args.resume, map_location='cpu')
-    filtered_dict = {k: v for k, v in state['model'].items() if k != "head.weight" and k != "head.bias"}
-    model.load_state_dict(filtered_dict, strict=False)
-    
-    if torch.cuda.is_available():
-        model = torch.nn.DataParallel(model)
-    model = model.cuda()
-    model.eval()
+    if args.modelname=="resnet_imagenet":
+        model = ResNet50(pretrained="imagenet")
+    elif args.modelname=="resnet_place365":
+        model = ResNet50(pretrained="place365")
+    elif args.modelname=="swin_base_patch4_window12_384":
+        model = swin_base_patch4_window12_384_in22k()
+        state = torch.load(args.resume, map_location='cpu')
+        filtered_dict = {k: v for k, v in state['model'].items() if k != "head.weight" and k != "head.bias"}
+        model.load_state_dict(filtered_dict, strict=False)
+
+        if torch.cuda.is_available():
+            model = torch.nn.DataParallel(model)
+        model = model.cuda()
+        model.eval()
+        
     print("model ready")
     
     if not os.path.exists(args.out_path_root):
