@@ -132,7 +132,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        #self.fc = nn.Linear(512 * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -177,7 +177,7 @@ class ResNet(nn.Module):
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
-        x = self.fc(x)
+        #x = self.fc(x)
         return x
     
 def to_numpy(tensor):
@@ -193,14 +193,14 @@ class ResNet50(torch.nn.Module):
     def __init__(self, pretrained="imagenet"):
         super(ResNet50, self).__init__()
         # self.base = models.resnet50(pretrained=pretrained)
-        self.base = ResNet(Bottleneck, [3, 4, 6, 3], 365)
+        self.base = ResNet(Bottleneck, [3, 4, 6, 3])
         if pretrained=="imagenet":
             state = torch.load(resnet50_model_path_imagenet)
-            filtered_dict = {k.replace("module.", ""): v for k, v in state.items()}
+            filtered_dict = {k.replace("module.", ""): v for k, v in state.items() if "fc" not in k}
             self.base.load_state_dict(filtered_dict, strict=True)
-        else:
+        elif pretrained=="place365":
             state = torch.load(resnet50_model_path_place365)
-            filtered_dict = {k.replace("module.", ""): v for k, v in state['state_dict'].items()}
+            filtered_dict = {k.replace("module.", ""): v for k, v in state['state_dict'].items() if "fc" not in k}
             self.base.load_state_dict(filtered_dict, strict=True)
  
     def forward(self, x):
