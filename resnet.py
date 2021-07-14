@@ -31,8 +31,8 @@ import pdb
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152']
 
-#resnet50_model_path = "../../pretrain/place_feature/resnet50-19c8e357.pth"
-resnet50_model_path = "./resnet50_places365.pth.tar"
+resnet50_model_path_imagenet = "./resnet50-19c8e357.pth"
+resnet50_model_path_place365 = "./resnet50_places365.pth.tar"
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -190,12 +190,16 @@ def to_numpy(tensor):
 
 
 class ResNet50(torch.nn.Module):
-    def __init__(self, pretrained=True):
+    def __init__(self, pretrained="imagenet"):
         super(ResNet50, self).__init__()
         # self.base = models.resnet50(pretrained=pretrained)
         self.base = ResNet(Bottleneck, [3, 4, 6, 3], 365)
-        if pretrained:
-            state = torch.load(resnet50_model_path)
+        if pretrained=="imagenet":
+            state = torch.load(resnet50_model_path_imagenet)
+            filtered_dict = {k.replace("module.", ""): v for k, v in state.items()}
+            self.base.load_state_dict(filtered_dict, strict=True)
+        else:
+            state = torch.load(resnet50_model_path_place365)
             filtered_dict = {k.replace("module.", ""): v for k, v in state['state_dict'].items()}
             self.base.load_state_dict(filtered_dict, strict=True)
  
