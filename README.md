@@ -4,7 +4,7 @@ pytorch;multi gpu;image feature;
 This is an implementation of extractig feature from image with resnet(pretrained on imagenet or place365) or swin_transformer.
 
 ## run
-Download the resnet paras pretrained in imagenet [resnet_imagenet](https://pan.baidu.com/s/1aK5hiUF05XQewToxU7BLqg) (psw:ptal)or resnet paras pretrained in place365 [resnet_place365](https://pan.baidu.com/s/1GKPLvZlPe5O0aXJ6uEJLQQ) (psw:i0d8)
+Download the resnet paras pretrained in imagenet [resnet_imagenet](https://pan.baidu.com/s/1aK5hiUF05XQewToxU7BLqg) (psw:ptal)or resnet paras pretrained in place365 [resnet_place365](https://pan.baidu.com/s/1GKPLvZlPe5O0aXJ6uEJLQQ) (psw:i0d8) or swin_transformer_l_224 at [swin_transformer](https://github.com/microsoft/Swin-Transformer) 
 run the code by:
 ```
 cd multi_gpu_image_feature_extractor
